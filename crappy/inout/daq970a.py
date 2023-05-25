@@ -4,7 +4,7 @@ import pyvisa
 from .inout import InOut
 from datetime import datetime
 from .general_class import General
-
+import logging
 class Daq970a(InOut,General):
 
     def __init__(self,id_device,channels):
@@ -14,6 +14,8 @@ class Daq970a(InOut,General):
         self.channels=channels
         self.ressource=pyvisa.ResourceManager()
         self.instr=None
+
+
 
 
     def open(self):
@@ -41,10 +43,14 @@ class Daq970a(InOut,General):
     
        
     def get_measure(self):
+        self.logger.info("Getting Measure at t time of channel  ")
         tab_res=[]
         for channel in self.channels.split(":"):
-            tab_res.append(float(self.instr.query(":MEASure:FRESistance? 10000,DEFault,(@"+channel+")")))
-
+            self.logger.info("Getting the measure for channel "+str(channel))
+            measure=float(self.instr.query(":MEASure:FRESistance? 10000,DEFault,(@"+channel+")"))
+            tab_res.append(measure)
+            self.logger.info("Measure done : "+str(measure))
+        self.logger.info("All measure are done ")
         return tab_res
 
     
@@ -52,7 +58,7 @@ class Daq970a(InOut,General):
             nbr_of_channel=len(self.channels.split(":"))
             count=100
             trigger_delay=0.20
-            print(self.channels)
+        
             self.instr.write(":CONFigure:FRESistance 10000,DEFault,(@"+self.channels+")")
             self.instr.write(':TRIGger:COUNt %G' % (count))
             self.instr.write(':TRIGger:SOURce %s' % ('TIMer'))
