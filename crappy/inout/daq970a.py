@@ -3,17 +3,14 @@ import time
 import pyvisa
 from .inout import InOut
 from datetime import datetime
-class Daq970a(InOut):
+from .general_class import General
 
-    def __init__(self,adress,channels):
-        """_summary_
+class Daq970a(InOut,General):
 
-        Args:
-            adress (_type_): _description_
-            channels (_type_): _description_
-        """
+    def __init__(self,id_device,channels):
+
         super().__init__()
-        self.id_device=adress
+        General.__init__(self,id_device)
         self.channels=channels
         self.ressource=pyvisa.ResourceManager()
         self.instr=None
@@ -22,12 +19,10 @@ class Daq970a(InOut):
     def open(self):
         """_summary_
         """
-       
-        self.instr=self.ressource.open_resource(self.id_device)
-        self.instr.baud_rate = 1000000
-        self.instr.write('*CLS')
-        self.instr.write('*RST')
+        pass
      
+    def get_channels(self):
+        return self.channels.split(":")
     
 
     def beeper(self):
@@ -43,26 +38,21 @@ class Daq970a(InOut):
             bool_res=True
         return bool_res
 
-    def get_idn(self):
-        """_summary_
-
-        Returns:
-            _type_: _description_
-        """
-        return self.instr.query('*IDN?')
+    
        
     def get_measure(self):
-        """_summary_
+        tab_res=[]
+        for channel in self.channels.split(":"):
+            tab_res.append(float(self.instr.query(":MEASure:FRESistance? 10000,DEFault,(@"+channel+")")))
 
-        Returns:
-            _type_: _description_
-        """
-        return self.instr.query(":MEASure:FRESistance? 10000,DEFault,(@"+self.channels+")")
+        return tab_res
+
     
     def complex_test(self):
             nbr_of_channel=len(self.channels.split(":"))
             count=100
-            trigger_delay=0.15
+            trigger_delay=0.20
+            print(self.channels)
             self.instr.write(":CONFigure:FRESistance 10000,DEFault,(@"+self.channels+")")
             self.instr.write(':TRIGger:COUNt %G' % (count))
             self.instr.write(':TRIGger:SOURce %s' % ('TIMer'))
@@ -71,7 +61,7 @@ class Daq970a(InOut):
     
             start_time = datetime.now()
             
-            time.sleep(0.1)
+            time.sleep(0.2)
             self.instr.write(':FETCh?')
             self.instr.timeout = (count*trigger_delay)*1000 #set timeout
             try:
@@ -93,5 +83,4 @@ class Daq970a(InOut):
         pass
 
     def close(self):
-        self.ressource.close()
-        self.instr.close()
+        pass
