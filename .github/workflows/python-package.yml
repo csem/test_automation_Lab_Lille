@@ -1,14 +1,13 @@
-name: Build and Upload Python Wheel to GitHub Release
+name: Build and Upload Python Package
 
-on:
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'Version for the release'
-        required: true
+on: 
+  push:
+    tags:
+      - v*  # Trigger the workflow on push to tags starting with v
 
 jobs:
   build:
+
     runs-on: ubuntu-latest
 
     steps:
@@ -31,10 +30,10 @@ jobs:
       id: create_release
       uses: actions/create-release@v1
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ github.event.inputs.version }}
-        release_name: Release ${{ github.event.inputs.version }}
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
         draft: false
         prerelease: false
 
@@ -44,8 +43,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        
-        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-        asset_path: ./dist/crappy-${{ github.event.inputs.version }}-py3-none-any.whl # replace this with the actual path to your .whl file
-        asset_name: crappy-${{ github.event.inputs.version }}-py3-none-any.whl # replace this with the actual name of your .whl file
+        upload_url: ${{ steps.create_release.outputs.upload_url }} 
+        asset_path: ./dist/crappy-${{ github.ref }}.whl
+        asset_name: crappy-${{ github.ref }}.whl
         asset_content_type: application/zip
