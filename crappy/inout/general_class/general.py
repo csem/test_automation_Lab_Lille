@@ -19,7 +19,7 @@ class General():
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         handler.setFormatter(formatter)
         self.logger.addHandler(handler)
-        self.logger.info(" Begining of the test ...")
+        self.logger.info(" TEST begin ...")
     
 
         
@@ -43,3 +43,5 @@ class General():
         self.ressource.close()
         self.instr.close()
 
+    def __get_logger__(self):
+        return self.logger

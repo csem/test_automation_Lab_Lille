@@ -55,10 +55,11 @@ class Daq970a(InOut,General):
 
     
     def complex_test(self):
+            self.logger.info("Complex  Test begin ... ")
             nbr_of_channel=len(self.channels.split(":"))
             count=100
             trigger_delay=0.20
-        
+            self.logger.info("Begin configuratation ...")
             self.instr.write(":CONFigure:FRESistance 10000,DEFault,(@"+self.channels+")")
             self.instr.write(':TRIGger:COUNt %G' % (count))
             self.instr.write(':TRIGger:SOURce %s' % ('TIMer'))
@@ -66,8 +67,12 @@ class Daq970a(InOut,General):
             self.instr.write(':INITiate')
     
             start_time = datetime.now()
-            
+            self.logger.info("Configuration done !")
+
             time.sleep(0.2)
+                    
+            self.logger.info("Measure begin ...")
+
             self.instr.write(':FETCh?')
             self.instr.timeout = (count*trigger_delay)*1000 #set timeout
             try:
@@ -78,6 +83,8 @@ class Daq970a(InOut,General):
             end_time = datetime.now()
             self.instr.timeout = 2000 #restore standard value
             value_list = [float(x) for x in data_list]
+            self.logger.info("Mesure done !")
+
             return [value_list[i::nbr_of_channel] for i in range(nbr_of_channel)], start_time, end_time
                 
 
