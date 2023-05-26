@@ -29,8 +29,10 @@ jobs:
     - name: Build wheel package
       run: python setup.py sdist bdist_wheel
 
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: dist
-        path: dist/*
+    - name: Commit wheel
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add dist/*
+        git commit -m "Add wheel" -a
+        git push
