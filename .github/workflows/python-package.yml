@@ -1,13 +1,12 @@
-name: Build and Upload Python Package
+name: Build, Release and Upload Python Package
 
 on: 
   push:
     tags:
-      - v*  # Trigger the workflow on push to tags starting with v
+      - 'v*'
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -26,6 +25,10 @@ jobs:
     - name: Build wheel package
       run: python setup.py sdist bdist_wheel
 
+    - name: Identify Wheel File
+      id: wheel_file
+      run: echo "::set-output name=path::$(ls dist/*.whl)"
+
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
@@ -43,7 +46,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }} 
-        asset_path: ./dist/crappy-${{ github.ref }}.whl
-        asset_name: crappy-${{ github.ref }}.whl
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ${{ steps.wheel_file.outputs.path }}
+        asset_name: ${{ steps.wheel_file.outputs.path }}
         asset_content_type: application/zip
