@@ -14,6 +14,7 @@ class Daq970a(InOut,General):
         self.channels=channels
         self.ressource=pyvisa.ResourceManager()
         self.instr=None
+        print("test")
 
 
 
