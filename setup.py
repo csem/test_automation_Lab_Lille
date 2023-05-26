@@ -70,8 +70,8 @@ if platform.system() == "Windows":
                            library_dirs=["C:\\Program Files\\IVI Foundation\\"
                                          "IVI\\Lib_x64\\msc"],
                            extra_compile_args=["/EHsc", "/WX"])
-  if input("would you like to install pyFgen module? ([y]/n)") != "n":
-    extensions.append(pyFgenModule)
+  #if input("would you like to install pyFgen module? ([y]/n)") != "n":
+    #extensions.append(pyFgenModule)
   clpath = "C:\\Program Files\\SiliconSoftware\\Runtime5.2.1\\"
   clModule = Extension('tool.clModule',
                        include_dirs=[clpath+"include",
