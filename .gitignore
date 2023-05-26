@@ -8,7 +8,7 @@
 *~
 *.bat
 build/
-dist/
+
 crappy.egg-info/
 *.sublime-*
 .idea/
