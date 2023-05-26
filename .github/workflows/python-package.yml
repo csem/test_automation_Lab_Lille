@@ -31,8 +31,8 @@ jobs:
 
     - name: Commit wheel
       run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
+        git config --local user.email "etienne.malacarne@gmail.com"
+        git config --local user.name "SwallowedStar"
         git add dist/*
         git commit -m "Add wheel" -a
         git push
