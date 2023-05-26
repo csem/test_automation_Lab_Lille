@@ -28,6 +28,69 @@ v = "%d.%d" % (sys.version_info.major, sys.version_info.minor)
 extensions = []
 pyFgenModule = clModule = None
 
+if platform.system() == "Linux":
+  try:
+    # Find the latest runtime version of SiliconSoftware install
+    clPath = '/opt/SiliconSoftware/' + \
+             sorted(next(walk('/opt/SiliconSoftware/'))[1])[-1] + '/lib64/'
+  except StopIteration:
+    print("Silicon Software not found, CameraLink will not be supported.")
+    # If the software is installed but not found
+    # just set clPath manually in this file
+    clPath = None
+  if clPath:
+    clModule = Extension('camera.clModule',
+                         sources=['sources/Cl_lib/CameraLink.cpp',
+                                  'sources/Cl_lib/pyCameraLink.cpp',
+                                  'sources/Cl_lib/clSerial.cpp'],
+                         extra_compile_args=["-std=c++11"],
+                         extra_link_args=["-l", "python%sm" % v, "-L", clPath,
+                                          "-l", "display", "-l", "clsersis",
+                                          "-l", "fglib5"],
+                         include_dirs=['/usr/local/lib/python%sm/dist-packages'
+                                       '/numpy/core/include' % v])
+    p = popen("lsmod |grep menable")
+    if len(p.read()) != 0:
+      print("menable kernel module found, installing CameraLink module.")
+      extensions.append(clModule)
+    else:
+      print("Cannot find menable kernel module, "
+            "CameraLink module won't be available.")
+
+if platform.system() == "Windows":
+  pyFgenModule = Extension('tool.pyFgenModule',
+                           include_dirs=["C:\\python%s\\site-packages\\numpy\\"
+                                         "core\\include" % v,
+                                         "C:\\Program Files (x86)\\IVI "
+                                         "Foundation\\VISA\\WinNT\\include",
+                                         "C:\\Program Files\\IVI Foundation\\"
+                                         "IVI\\Include"],
+                           sources=['sources/niFgen/pyFgen.cpp'],
+                           libraries=["niFgen"],
+                           library_dirs=["C:\\Program Files\\IVI Foundation\\"
+                                         "IVI\\Lib_x64\\msc"],
+                           extra_compile_args=["/EHsc", "/WX"])
+  #if input("would you like to install pyFgen module? ([y]/n)") != "n":
+    #extensions.append(pyFgenModule)
+  clpath = "C:\\Program Files\\SiliconSoftware\\Runtime5.2.1\\"
+  clModule = Extension('tool.clModule',
+                       include_dirs=[clpath+"include",
+                                     "C:\\python{}\\Lib\\site-packages\\numpy"
+                                     "\\core\\include".format(
+                                       v.replace('.', ''))],
+                       sources=['sources/Cl_lib/CameraLink.cpp',
+                                'sources/Cl_lib/pyCameraLink.cpp',
+                                'sources/Cl_lib/clSerial.cpp'],
+                       libraries=["clsersis", "fglib5"],
+                       library_dirs=[clpath+"lib\\visualc"],
+                       extra_compile_args=["/EHsc", "/WX"])
+
+  p = popen('driverquery /NH |findstr "me4"')
+  if len(p.read()) != 0:
+    extensions.append(clModule)
+  else:
+    print("Can't find microEnable4 Device driver, clModule will not be "
+          "compiled")
 
 docs_files = [('crappy/' + path, [path + '/' + name for name in paths]) for
               (path, _, paths) in walk('docs/source')]
