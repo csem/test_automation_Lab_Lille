@@ -25,7 +25,7 @@ from .waveshare_ad_da_ft232h import Waveshare_ad_da_ft232h
 from .waveshare_high_precision import Waveshare_high_precision
 from .daq970a import Daq970a
 # Win specific
-from .daqmx import Daqmx
+#from .daqmx import Daqmx
 
 # All the inout objects
 inout_dict = MetaIO.classes

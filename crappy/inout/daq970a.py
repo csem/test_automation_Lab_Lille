@@ -4,8 +4,9 @@ import pyvisa
 from .inout import InOut
 from datetime import datetime
 from .general_class import General
+from .general_class import LoggerPerso
 import logging
-class Daq970a(InOut,General):
+class Daq970a(InOut,General,LoggerPerso):
 
     def __init__(self,id_device,channels):
 
@@ -14,7 +15,8 @@ class Daq970a(InOut,General):
         self.channels=channels
         self.ressource=pyvisa.ResourceManager()
         self.instr=None
-        print("test")
+        class_name=__name__
+        LoggerPerso.__init__(self,class_name)
 
 
 
