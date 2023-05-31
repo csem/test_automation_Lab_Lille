@@ -14,16 +14,30 @@ class General():
 
     def __open__(self):
         self.logger.info("Opening of device ...")
-        self.instr=self.ressource.open_resource(self.id_device)
+        try:
+            self.instr=self.ressource.open_resource(self.id_device)
         
-        self.instr.baud_rate = 1000000
-        self.instr.write('*CLS')
-        self.instr.write('*RST')
+            self.instr.baud_rate = 1000000
+            self.instr.write('*CLS')
+            self.instr.write('*RST')
+            self.logger.info("Opening done !")
+        except Exception as e:
+            self.logger.error("Error: device is not opened. Check if your id is good or if the device is connected.")
+       
  
 
     def __get_idn__(self):
-      
-        var_temp=self.instr.query('*IDN?')
+
+        self.logger.info("Getting IDN ...")
+        try:
+            var_temp=self.instr.query('*IDN?')
+            self.logger.info("IDN is : "+str(var_temp))
+            self.logger.info("IDN done !")
+        except Exception as e:
+            self.logger.error(" Error : IDN has not be obtained")
+
+
+
  
         return var_temp
     
