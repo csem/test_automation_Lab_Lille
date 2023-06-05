@@ -49,7 +49,29 @@ class Delta(InOut,LoggerPerso):
         self.logger.info(self.bool_res)
         return res
 
+    def read_bluetooth(self,id,data_adress):
+        async def run():
+                scanner = BleakScanner()
+                devices = await scanner.discover()
 
+                
+                async with BleakClient(id) as client:
+                
+
+                    try:
+                        value = await client.read_gatt_char(data_adress)
+                        self.bool_res=True
+                    except Exception as e:
+                        print(e)
+
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(run())
+        res=self.bool_res
+        self.bool_res=False
+        self.logger.info(self.bool_res)
+        return res
+
+            
 
 
     def flash_firmware(self):
