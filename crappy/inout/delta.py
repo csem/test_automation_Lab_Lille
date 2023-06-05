@@ -47,7 +47,7 @@ class Delta(InOut,LoggerPerso):
         res=self.bool_res
         self.bool_res=False
         self.logger.info(self.bool_res)
-        return self.bool_res
+        return res
 
 
 
@@ -78,7 +78,7 @@ class Delta(InOut,LoggerPerso):
                 api.erase_all()
                 self.logger.info("Reset done !")
 
-                api.program_file("full.hex")
+                api.program_file("sandbox/full.hex")
 
                         
                 self.logger.info("Flashing done!")
