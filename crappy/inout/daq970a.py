@@ -44,7 +44,7 @@ class Daq970a(InOut,General,LoggerPerso):
         return bool_res
 
     
-    def get_one_measure(self, measurement_type:str,volt_type=None,amp_type=None,range_measure="DEFAULT",resolution_measure="DEFAULT")->list[float]:
+    def get_one_measure(self, measurement_type,volt_type=None,amp_type=None,range_measure="DEFAULT",resolution_measure="DEFAULT"):
         self.logger.info("Getting Measure at t time of channel  ")
         tab_res = []
         try:
