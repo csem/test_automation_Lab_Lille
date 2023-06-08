@@ -132,6 +132,49 @@ class Delta(InOut,LoggerPerso):
         else:
             print(f'Résultats de la commande : {stdout.decode()}')
             return True
+        
+    
+
+    def get_add_mac(self,device_name):
+        def handle_discovery(device, advertisement_data):
+            if advertisement_data[0]==device_name:
+                    address_l.append(device.address)
+                    
+
+
+
+        async def run():
+            scanner = BleakScanner()
+            scanner.register_detection_callback(handle_discovery)
+      
+            await scanner.start()
+            await asyncio.sleep(10)
+            await scanner.stop()
+
+
+        address_l = []
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(run())
+        return address_l[0]
+
+    def get_firm_version(self,device_name):
+        adress=self.get_add_mac(device_name)
+
+        CHARACTERISTIC_UUID = "00002a26-0000-1000-8000-00805f9b34fb"
+        version_firm=[]
+        async def run(address):
+            async with BleakClient(address) as client:
+                print(f"Connected: {client.is_connected}")
+
+                value = await client.read_gatt_char(CHARACTERISTIC_UUID)
+                version_firm.append(value.decode())
+                print(f"Value: {value}")
+
+
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(run(address))
+
+        return True,version_firm[0]
 
 
     def get_data(self):
