@@ -9,6 +9,7 @@ import logging
 from pynrfjprog import LowLevel
 import asyncio
 from bleak import BleakClient, BleakScanner
+import subprocess
 class Delta(InOut,LoggerPerso):
 
     def __init__(self):
@@ -74,9 +75,9 @@ class Delta(InOut,LoggerPerso):
         return res
 
             
+    
 
-
-    def flash_firmware(self):
+    def flash_firmware_jlink(self):
         bool_res=False
         with LowLevel.API('NRF52') as api:
             self.logger.info("Open connection with JLINK ...")
@@ -119,6 +120,18 @@ class Delta(InOut,LoggerPerso):
                 pass
         return bool_res
             
+    def flash_firmware_ota_dfu(self,id_device,version_firm,name_device):
+
+        command = f"nrfutil nrf5sdk-tools dfu ble -ic NRF52 -pkg artifacts/app_{version_firm}.zip -p {id_device}-n "{name_device}"  -f" 
+        process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = process.communicate()
+
+        if process.returncode != 0:
+            print(f'Erreur lors de l\'exécution de la commande : {stderr.decode()}')
+            return False
+        else:
+            print(f'Résultats de la commande : {stdout.decode()}')
+                return True
 
 
     def get_data(self):
