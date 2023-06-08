@@ -69,7 +69,8 @@ class Daq970a(InOut,General,LoggerPerso):
 
 
     
-    def get_measure_over_time(self,  measurement_type:str,volt_type=None,amp_type=None,range_measure="DEFAULT",resolution_measure="DEFAULT",trigger_delay=0.2,count=100,timeout=1000)-> list[float]:
+    def get_measure_over_time(self,  measurement_type,volt_type=None,amp_type=None,range_measure="DEFAULT",resolution_measure="DEFAULT",trigger_delay=0.2,count=100,timeout=1000)-> list[float]:
+        # More Generalisation !
         self.logger.info("Test getting measure for X time negim ... ")
         nbr_of_channel=len(self.channels.split(":"))
 
