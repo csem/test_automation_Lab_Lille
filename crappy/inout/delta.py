@@ -40,6 +40,7 @@ class Delta(InOut,LoggerPerso):
 
             async with BleakClient(id) as client:
                 print(f"Connected: {client.is_connected}")
+
                 self.bool_res=client.is_connected
 
         loop = asyncio.get_event_loop()
@@ -47,6 +48,7 @@ class Delta(InOut,LoggerPerso):
         res=self.bool_res
         self.bool_res=False
         self.logger.info(self.bool_res)
+        self.logger.info("Bluetooth connexion is ok !")
         return res
 
     def read_bluetooth(self,id,data_adress):

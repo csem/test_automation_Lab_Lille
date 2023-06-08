@@ -44,14 +44,21 @@ class Daq970a(InOut,General,LoggerPerso):
         return bool_res
 
     
-       
-    def get_measure(self):
+    def get_one_measure(self, measurement_type:str,volt_type=None,amp_type=None,range_measure="DEFAULT",resolution_measure="DEFAULT")->list[float]:
         self.logger.info("Getting Measure at t time of channel  ")
-        tab_res=[]
+        tab_res = []
         try:
             for channel in self.channels.split(":"):
-                self.logger.info("Getting the measure for channel "+str(channel))
-                measure=float(self.instr.query(":MEASure:FRESistance? 10000,DEFault,(@"+channel+")"))
+                self.logger.info(f"Getting the measure for channel {channel}")
+                if measurement_type.lower() == "volt":
+                    measure = float(self.instr.query(f":MEASure:VOLTage:{volt_type}? {range_measure},{resolution_measure},(@{channel})"))
+                elif measurement_type.lower() == "ampere":
+                    measure = float(self.instr.query(f":MEASure:CURRent:{amp_type}? {range_measure},{resolution_measure},(@{channel})"))
+                elif measurement_type.lower() == "resistance":
+                    measure = float(self.instr.query(f":MEASure:FRESistance? {range_measure},{resolution_measure},(@{channel})"))
+                else:
+                    self.logger.error("Invalid measurement type. Valid types are: 'volt', 'ampere', 'resistance'.")
+                    return False
                 tab_res.append(measure)
                 self.logger.info("Measure done : "+str(measure))
             self.logger.info("All measure are done ")
@@ -60,43 +67,55 @@ class Daq970a(InOut,General,LoggerPerso):
             self.logger.error("Error : The measure was not done correctly. Check if the channel are correct or if the config is correct")
         return tab_res
 
+
     
-    def complex_test(self):
-            self.logger.info("Complex Test begin ... ")
-            nbr_of_channel=len(self.channels.split(":"))
-            count=100
-            trigger_delay=0.20
-            self.logger.info("Begin configuratation ...")
+    def get_measure_over_time(self,  measurement_type:str,volt_type=None,amp_type=None,range_measure="DEFAULT",resolution_measure="DEFAULT",trigger_delay=0.2,count=100,timeout=1000)-> list[float]:
+        self.logger.info("Test getting measure for X time negim ... ")
+        nbr_of_channel=len(self.channels.split(":"))
+
+        self.logger.info("Begin configuratation ...")
+        try:
+            if measurement_type.lower() == "volt":
+                self.instr.write(f":CONFigure:VOLTage:{volt_type} {range_measure},{resolution_measure},(@{self.channels})")
+            elif measurement_type.lower() == "ampere":
+                self.instr.write(f":CONFigure:CURRent:{amp_type} {range_measure},{resolution_measure},(@{self.channels})")
+            elif measurement_type.lower() == "resistance":
+                self.instr.write(f":CONFigure:FRESistance {range_measure},{resolution_measure},(@{self.channels})")
+            else:
+                self.logger.error("Invalid measurement type. Valid types are: 'volt', 'ampere', 'resistance'.")
+                return False
+            
+
+            self.instr.write(':TRIGger:COUNt %G' % (count))
+            self.instr.write(':TRIGger:SOURce %s' % ('TIMer'))
+            self.instr.write(':TRIGger:TIMer %G' % (trigger_delay))
+            self.instr.write(':INITiate')
+
+            start_time = datetime.now()
+            self.logger.info("Configuration done !")
+
+            time.sleep(0.2)
+                    
+            self.logger.info("Measure begin ...")
+
+            self.instr.write(':FETCh?')
+            self.instr.timeout = (count*trigger_delay)*timeout 
             try:
-                self.instr.write(":CONFigure:FRESistance 10000,DEFault,(@"+self.channels+")")
-                self.instr.write(':TRIGger:COUNt %G' % (count))
-                self.instr.write(':TRIGger:SOURce %s' % ('TIMer'))
-                self.instr.write(':TRIGger:TIMer %G' % (trigger_delay))
-                self.instr.write(':INITiate')
-        
-                start_time = datetime.now()
-                self.logger.info("Configuration done !")
-
-                time.sleep(0.2)
-                        
-                self.logger.info("Measure begin ...")
-
-                self.instr.write(':FETCh?')
-                self.instr.timeout = (count*trigger_delay)*1000 #set timeout
-                try:
-                    data_list  = self.instr.read().rstrip('\n').split(',')
-                except:
-                    print('Error: Time step too short')
-                    return [[0] for i in range(nbr_of_channel)], 0, 0
-                end_time = datetime.now()
-                self.instr.timeout = 2000 #restore standard value
-                value_list = [float(x) for x in data_list]
-                self.logger.info("Mesure done !")
-            except Exception as e:
-                self.logger.error("Error")
-
+                data_list  = self.instr.read().rstrip('\n').split(',')
+            except:
+                print('Error: Time step too short')
+                return [[0] for i in range(nbr_of_channel)], 0, 0
+            end_time = datetime.now()
+            self.instr.timeout = 2000 
+            value_list = [float(x) for x in data_list]
+            self.logger.info("Mesure done !")
             return [value_list[i::nbr_of_channel] for i in range(nbr_of_channel)], start_time, end_time
-                
+
+        except Exception as e:
+            self.logger.error(f"Error : {e}")
+            return False
+
+
 
 
     def get_data(self):
