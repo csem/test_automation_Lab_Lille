@@ -131,7 +131,7 @@ class Delta(InOut,LoggerPerso):
             return False
         else:
             print(f'Résultats de la commande : {stdout.decode()}')
-                return True
+            return True
 
 
     def get_data(self):
