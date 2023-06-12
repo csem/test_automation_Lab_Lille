@@ -10,6 +10,7 @@ from pynrfjprog import LowLevel
 import asyncio
 from bleak import BleakClient, BleakScanner
 import subprocess
+import inspect
 class Delta(InOut,LoggerPerso):
 
     def __init__(self):
@@ -29,52 +30,7 @@ class Delta(InOut,LoggerPerso):
     def open(self):
         pass
      
-    def connexion_bluetooth(self,id):
-        self.logger.info("Begin testing bluetooth connexion ...")
-     
-        async def run():
-            scanner = BleakScanner()
-            devices = await scanner.discover()
 
-            for device in devices:
-                pass
-
-            async with BleakClient(id) as client:
-                print(f"Connected: {client.is_connected}")
-
-                self.bool_res=client.is_connected
-
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(run())
-        res=self.bool_res
-        self.bool_res=False
-        self.logger.info(self.bool_res)
-        self.logger.info("Bluetooth connexion is ok !")
-        return res
-
-    def read_bluetooth(self,id,data_adress):
-        async def run():
-                scanner = BleakScanner()
-                devices = await scanner.discover()
-
-                
-                async with BleakClient(id) as client:
-                
-
-                    try:
-                        value = await client.read_gatt_char(data_adress)
-                        self.bool_res=True
-                    except Exception as e:
-                        print(e)
-
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(run())
-        res=self.bool_res
-        self.bool_res=False
-        self.logger.info(self.bool_res)
-        return res
-
-            
     
 
     def flash_firmware_jlink(self):
@@ -133,7 +89,26 @@ class Delta(InOut,LoggerPerso):
             print(f'Résultats de la commande : {stdout.decode()}')
             return True
         
-    
+    def get_all_delta(self):
+        def handle_discovery(device, advertisement_data):
+            device_prefix = "DELTA_00"
+            if advertisement_data[0].startswith(device_prefix) and device.address not in address_l:
+                address_l.append(device.address)
+
+        async def run():
+            scanner = BleakScanner()
+            scanner.register_detection_callback(handle_discovery)
+      
+            await scanner.start()
+            await asyncio.sleep(15)
+            await scanner.stop()
+
+
+        address_l = []
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(run())
+        return address_l
+
 
     def get_add_mac(self,device_name):
         def handle_discovery(device, advertisement_data):
@@ -146,7 +121,7 @@ class Delta(InOut,LoggerPerso):
         async def run():
             scanner = BleakScanner()
             scanner.register_detection_callback(handle_discovery)
-      
+
             await scanner.start()
             await asyncio.sleep(10)
             await scanner.stop()
@@ -155,26 +130,81 @@ class Delta(InOut,LoggerPerso):
         address_l = []
         loop = asyncio.get_event_loop()
         loop.run_until_complete(run())
+
         return address_l[0]
 
-    def get_firm_version(self,device_name):
-        adress=self.get_add_mac(device_name)
-
-        CHARACTERISTIC_UUID = "00002a26-0000-1000-8000-00805f9b34fb"
-        version_firm=[]
+    def get_value_from_device(self,uuid,address):
+        res_value=[]
         async def run(address):
             async with BleakClient(address) as client:
                 print(f"Connected: {client.is_connected}")
 
-                value = await client.read_gatt_char(CHARACTERISTIC_UUID)
-                version_firm.append(value.decode())
+                value = await client.read_gatt_char(uuid)
+                res_value.append(value)
                 print(f"Value: {value}")
 
 
         loop = asyncio.get_event_loop()
         loop.run_until_complete(run(address))
+        return res_value[0]
+    
+    def get_multiple_value_from_device(self,uuid,address,time):
+        def callback(sender: int, data: bytearray):
+            res_l.append(data)
+        async def run(address,uuid,time):
 
-        return True,version_firm[0]
+            async with BleakClient(address) as client:
+                print(f"Connected: {client.is_connected}")
+        
+                await client.start_notify(uuid, callback)
+                await asyncio.sleep(time)  
+                await client.stop_notify(uuid)
+
+        res_l = []
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(run(address,uuid,time))
+        return res_l
+
+
+    ###################### GET GENERAL INFORMATIONS ###########################
+    def get_firm_version(self,device_name,uuid="00002a26-0000-1000-8000-00805f9b34fb"):
+        address=self.get_add_mac(device_name)
+
+        version_firm=self.get_value_from_device(uuid,address)
+        return version_firm.decode()
+
+    
+    def get_model_number(self,device_name,uuid="00002a24-0000-1000-8000-00805f9b34fb"):
+        address=self.get_add_mac(device_name)
+
+        model_number=self.get_value_from_device(uuid,address)
+        return model_number[0]
+    
+    def get_serial_number(self,device_name,uuid="00002a25-0000-1000-8000-00805f9b34fb"):
+        address=self.get_add_mac(device_name)
+        serial_number=self.get_value_from_device(uuid,address)
+        return serial_number[0]
+    
+    def get_manufact_name(self,device_name,uuid="00002a29-0000-1000-8000-00805f9b34fb"):
+        address=self.get_add_mac(device_name)
+
+        manufact_name=self.get_value_from_device(uuid,address)
+        return manufact_name[0]
+    
+
+    ###################### GET BATTERY INFORMATIONS ###########################
+
+    def get_battery_level(self,device_name,uuid="00002a19-0000-1000-8000-00805f9b34fb"):
+        address=self.get_add_mac(device_name)
+        battery_level=self.get_value_from_device(uuid,address)
+        return battery_level[0]
+    
+    def get_battery_level_multiple(self,device_name,uuid="00002a19-0000-1000-8000-00805f9b34fb",time=120):
+        address=self.get_add_mac(device_name)
+        battery_level=self.get_multiple_value_from_device(uuid,address,time)
+        return battery_level
+
+
 
 
     def get_data(self):
