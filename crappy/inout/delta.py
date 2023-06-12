@@ -178,18 +178,18 @@ class Delta(InOut,LoggerPerso):
         address=self.get_add_mac(device_name)
 
         model_number=self.get_value_from_device(uuid,address)
-        return model_number[0]
+        return model_number.decode()
     
     def get_serial_number(self,device_name,uuid="00002a25-0000-1000-8000-00805f9b34fb"):
         address=self.get_add_mac(device_name)
         serial_number=self.get_value_from_device(uuid,address)
-        return serial_number[0]
+        return serial_number.decode()
     
     def get_manufact_name(self,device_name,uuid="00002a29-0000-1000-8000-00805f9b34fb"):
         address=self.get_add_mac(device_name)
 
         manufact_name=self.get_value_from_device(uuid,address)
-        return manufact_name[0]
+        return manufact_name.decode()
     
 
     ###################### GET BATTERY INFORMATIONS ###########################
@@ -203,6 +203,39 @@ class Delta(InOut,LoggerPerso):
         address=self.get_add_mac(device_name)
         battery_level=self.get_multiple_value_from_device(uuid,address,time)
         return battery_level
+
+    ###################### GET USERS INFORMATIONS ###########################
+    def get_age(self, device_name, uuid="00002a80-0000-1000-8000-00805f9b34fb"):
+        address = self.get_add_mac(device_name)
+        age = self.get_value_from_device(uuid, address)
+        return age
+
+    def get_height(self, device_name, uuid="00002a8e-0000-1000-8000-00805f9b34fb"):
+        address = self.get_add_mac(device_name)
+        height = self.get_value_from_device(uuid, address)
+        return height
+
+    def get_weight(self, device_name, uuid="00002a98-0000-1000-8000-00805f9b34fb"):
+        address = self.get_add_mac(device_name)
+        weight = self.get_value_from_device(uuid, address)
+        return weight
+
+    def get_gender(self, device_name, uuid="00002a8c-0000-1000-8000-00805f9b34fb"):
+        address = self.get_add_mac(device_name)
+        gender = self.get_value_from_device(uuid, address)
+        return gender
+    
+    ###################### GET HEARTH INFORMATIONS ###########################
+    def get_body_sensor_location(self, device_name, uuid="00002a38-0000-1000-8000-00805f9b34fb"):
+        address = self.get_add_mac(device_name)
+        body_sensor_location = self.get_value_from_device(uuid, address)
+        return body_sensor_location.decode()
+
+    def get_heart_rate_measurement(self, device_name, uuid="00002a37-0000-1000-8000-00805f9b34fb"):
+        address = self.get_add_mac(device_name)
+        heart_rate_measurement = self.get_value_from_device(uuid, address)
+        return heart_rate_measurement.decode()
+
 
 
 
