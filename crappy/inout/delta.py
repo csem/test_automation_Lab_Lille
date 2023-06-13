@@ -21,6 +21,7 @@ class Delta(InOut,LoggerPerso):
             super().__init__()
             self.api=None
             self.bool_res=False
+            self.device_name=None
 
             self.logger.info(" Initialization done !")
         except Exception as e:
@@ -164,19 +165,33 @@ class Delta(InOut,LoggerPerso):
         loop = asyncio.get_event_loop()
         loop.run_until_complete(run(address,uuid,time))
         return res_l
+    
+
+    def __sub_decode_bytearray_int(self,mapping):
+        return int(''.join(str(mapping[b]) for b in data3))
+
+    def decode_bytearray(self,bytearray,device_name,get_function_name):
+        firm=self.get_firm_version(device_name)
+        v_firm=firm.split("+")
+
+        if v_firm=="v1.1.114":
+            if get_function_name=="get_height":
+                mapping = {1: 2, 33: 10, 159: 2, 237: 10}
+                return self.__sub_decode_bytearray_int(mapping)
+            elif get_function_name=="get_weight":
+                mapping = {109: 2, 28: 10}
+                return self.__sub_decode_bytearray_int(mapping)
+
 
 
     ###################### GET GENERAL INFORMATIONS ###########################
     def get_firm_version(self,device_name,uuid="00002a26-0000-1000-8000-00805f9b34fb"):
         address=self.get_add_mac(device_name)
-
         version_firm=self.get_value_from_device(uuid,address)
         return version_firm.decode()
-
     
     def get_model_number(self,device_name,uuid="00002a24-0000-1000-8000-00805f9b34fb"):
         address=self.get_add_mac(device_name)
-
         model_number=self.get_value_from_device(uuid,address)
         return model_number.decode()
     
