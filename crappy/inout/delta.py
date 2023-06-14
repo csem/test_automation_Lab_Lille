@@ -130,7 +130,7 @@ class Delta(InOut,LoggerPerso):
 
     async def get_add_mac(self,device_name):
         def handle_discovery(device, advertisement_data):
-            if advertisement_data[0] == device_name:
+            if advertisement_data[0].lower() == device_name.lower():
                 address_l.append(device.address)
 
         async def run():
