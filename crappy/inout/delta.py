@@ -76,8 +76,18 @@ class Delta(InOut,LoggerPerso):
             except Exception as e:
                 pass
         return bool_res
-            
+
+
+
+
     def flash_firmware_ota_dfu(self,id_device,version_firm,name_device):
+        async def is_device_available(device_address):
+            client = BleakClient(device_address)
+            try:
+                return await client.connect()
+            finally:
+                if client.is_connected:
+                    await client.disconnect()  
 
         command = f"nrfutil nrf5sdk-tools dfu ble -ic NRF52 -pkg sandbox/artifacts/app_{version_firm}.zip -p {id_device} -n {name_device}  -f" 
         process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -91,7 +101,11 @@ class Delta(InOut,LoggerPerso):
             process.wait()
 
 
-            time.sleep(20)
+            loop = asyncio.get_event_loop()
+            device_is_available = loop.run_until_complete(is_device_available(id_device))
+            if not device_is_available:
+                print('L\'appareil n\'est pas disponible après le flashage.')
+                return False
             return True
     def get_all_delta(self):
         def handle_discovery(device, advertisement_data):
@@ -125,7 +139,7 @@ class Delta(InOut,LoggerPerso):
         async def run():
             scanner = BleakScanner()
             scanner.register_detection_callback(handle_discovery)
-            if not scanner.is_scanning:
+           
 
                 await scanner.start()
                 await asyncio.sleep(20)
