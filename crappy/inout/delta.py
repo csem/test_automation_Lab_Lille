@@ -128,7 +128,7 @@ class Delta(InOut,LoggerPerso):
         return address_l
 
 
-    async def get_add_mac(device_name):
+    def get_add_mac(device_name):
         def handle_discovery(device, advertisement_data):
             if advertisement_data[0] == device_name:
                 address_l.append(device.address)
