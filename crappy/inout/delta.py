@@ -128,24 +128,32 @@ class Delta(InOut,LoggerPerso):
         return address_l
 
 
-    def get_add_mac(self,device_name):
-        async def find_mac_address(device_name):
-            devices = await BleakScanner.discover()
-            for device in devices:
-                if device.name is not None and device_name.lower() == device.name.lower():
-                    return device.address
+    async def get_mac_address(device_name):
+        def handle_discovery(device, advertisement_data):
+            if advertisement_data[0] == device_name:
+                address_l.append(device.address)
 
+        async def run():
+            scanner = BleakScanner()
+            scanner.register_detection_callback(handle_discovery)
+            await scanner.start()
+            await asyncio.sleep(20)
+            await scanner.stop()
+
+        address_l = []
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(run())
+
+        if len(address_l) > 0:
+            return address_l[0]
+        else:
             return None
 
-        async def main():
-            mac_address = await find_mac_address(device_name)
-            if mac_address:
-                print(f"L'adresse MAC de {device_name} est : {mac_address}")
-            else:
-                print(f"Aucun appareil trouvé avec le nom {device_name}.")
-
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(main())
+    mac_address = asyncio.run(get_mac_address(device_name))
+    if mac_address:
+        print(f"L'adresse MAC de {device_name} est : {mac_address}")
+    else:
+        print(f"Aucun appareil trouvé avec le nom {device_name}.")
 
     def get_value_from_device(self,uuid,address):
         res_value=[]
