@@ -90,9 +90,8 @@ class Delta(InOut,LoggerPerso):
             print(f'Résultats de la commande : {stdout.decode()}')
             process.wait()
 
-            process.terminate()
 
-            time.sleep(1)
+            time.sleep(20)
             return True
     def get_all_delta(self):
         def handle_discovery(device, advertisement_data):
