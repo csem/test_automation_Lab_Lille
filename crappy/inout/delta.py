@@ -125,10 +125,11 @@ class Delta(InOut,LoggerPerso):
         async def run():
             scanner = BleakScanner()
             scanner.register_detection_callback(handle_discovery)
+            if not scanner.is_scanning:
 
-            await scanner.start()
-            await asyncio.sleep(20)
-            await scanner.stop()
+                await scanner.start()
+                await asyncio.sleep(20)
+                await scanner.stop()
 
 
         address_l = []
