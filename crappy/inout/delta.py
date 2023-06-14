@@ -132,7 +132,7 @@ class Delta(InOut,LoggerPerso):
         async def find_mac_address(device_name):
             devices = await BleakScanner.discover()
             for device in devices:
-                if device_name == device.name:
+                if device.name is not None and device_name.lower() == device.name.lower():
                     return device.address
 
             return None
