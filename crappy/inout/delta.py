@@ -141,7 +141,7 @@ class Delta(InOut,LoggerPerso):
             await scanner.stop()
 
         address_l = []
-        loop = asyncio.get_event_loop()
+
         await run()
 
         if len(address_l) > 0:
