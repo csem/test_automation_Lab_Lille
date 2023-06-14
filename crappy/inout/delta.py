@@ -142,7 +142,7 @@ class Delta(InOut,LoggerPerso):
 
         address_l = []
         loop = asyncio.get_event_loop()
-        loop.run_until_complete(run())
+        await run()
 
         if len(address_l) > 0:
             return address_l[0]
