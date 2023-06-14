@@ -232,7 +232,7 @@ class Delta(InOut,LoggerPerso):
     ###################### GET BATTERY INFORMATIONS ###########################
 
     def get_battery_level(self,device_name,uuid="00002a19-0000-1000-8000-00805f9b34fb"):
-        address=self.get_add_mac(device_name)
+        address=await self.get_add_mac(device_name)
         battery_level=self.get_value_from_device(uuid,address)
         return battery_level[0]
     
