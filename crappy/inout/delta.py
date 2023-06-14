@@ -144,7 +144,7 @@ class Delta(InOut,LoggerPerso):
         asyncio.set_event_loop(loop)
         try:
             # Exécuter la fonction get_add_mac
-            address = loop.run_until_complete(get_add_mac(device_name))
+            address = loop.run_until_complete(get_addd_mac(device_name))
         finally:
             # Fermer la boucle d'événements
             loop.close()
