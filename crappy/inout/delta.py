@@ -139,7 +139,6 @@ class Delta(InOut,LoggerPerso):
 
             return None
 
-        device_name = "your_device_name_here"  # remplacer par le nom de votre appareil
         address = asyncio.run(get_addd_mac(device_name))
 
         if address:
