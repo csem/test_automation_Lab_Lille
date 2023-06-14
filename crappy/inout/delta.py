@@ -128,7 +128,7 @@ class Delta(InOut,LoggerPerso):
         return address_l
 
 
-    def get_mac_address(device_name):
+    async def get_mac_address(device_name):
         def handle_discovery(device, advertisement_data):
             if advertisement_data[0] == device_name:
                 address_l.append(device.address)
@@ -149,11 +149,11 @@ class Delta(InOut,LoggerPerso):
         else:
             return None
 
-    mac_address = asyncio.run(get_mac_address(device_name))
-    if mac_address:
-        print(f"L'adresse MAC de {device_name} est : {mac_address}")
-    else:
-        print(f"Aucun appareil trouvé avec le nom {device_name}.")
+        mac_address = asyncio.run(get_mac_address(device_name))
+        if mac_address:
+            print(f"L'adresse MAC de {device_name} est : {mac_address}")
+        else:
+            print(f"Aucun appareil trouvé avec le nom {device_name}.")
 
     def get_value_from_device(self,uuid,address):
         res_value=[]
