@@ -127,7 +127,7 @@ class Delta(InOut,LoggerPerso):
             scanner.register_detection_callback(handle_discovery)
 
             await scanner.start()
-            await asyncio.sleep(10)
+            await asyncio.sleep(20)
             await scanner.stop()
 
 
