@@ -88,8 +88,12 @@ class Delta(InOut,LoggerPerso):
             return False
         else:
             print(f'Résultats de la commande : {stdout.decode()}')
+            process.wait()
+
+            process.terminate()
+
+            time.sleep(1)
             return True
-        
     def get_all_delta(self):
         def handle_discovery(device, advertisement_data):
             device_prefix = "DELTA_00"
