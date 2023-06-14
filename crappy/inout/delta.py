@@ -139,7 +139,16 @@ class Delta(InOut,LoggerPerso):
 
             return None
 
-        address = asyncio.run(get_addd_mac(device_name))
+        loop = asyncio.new_event_loop()
+        # Le définir comme boucle d'événements par défaut
+        asyncio.set_event_loop(loop)
+        try:
+            # Exécuter la fonction get_add_mac
+            address = loop.run_until_complete(get_add_mac(device_name))
+        finally:
+            # Fermer la boucle d'événements
+            loop.close()
+
 
         if address:
             print(f"Adresse MAC de {device_name}: {address}")
