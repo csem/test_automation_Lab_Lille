@@ -30,7 +30,7 @@ class Delta(InOut,LoggerPerso):
             self.bool_res=False
             self.device_name=None
             self.mac_address=None
-            self.adapter = pygatt.BGAPIBackend()
+            
             self.event = Event()
             self.scan_interval = 15  # or whatever you want your scan interval to be
 
@@ -103,6 +103,7 @@ class Delta(InOut,LoggerPerso):
         
     def get_all_delta(self):
         self.adapter.start()
+        self.adapter 
         device_prefix = "DELTA_00"
         address_l = []
         devices = self.adapter.scan()
@@ -119,13 +120,15 @@ class Delta(InOut,LoggerPerso):
 
             return self.mac_address
         else:
-            self.adapter.start()
-            devices = self.adapter.scan()
+            adapter=pygatt.BGAPIBackend()
+            adapter.start()
+            time.sleep(1)
+            devices = adapter.scan()
             for device in devices:
                 if device['name'] == device_name:
 
                     self.mac_address = device['address']
-                    self.adapter.stop()
+                    adapter.stop()
                     return device['address']
 
 
