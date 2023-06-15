@@ -118,7 +118,7 @@ class Delta(InOut,LoggerPerso):
 
         if self.mac_address is not None:
             return self.mac_address
-self.adapter.reset()
+        self.adapter.reset()
         devices = self.adapter.scan()
         for device in devices:
             if device['name'] == device_name:
