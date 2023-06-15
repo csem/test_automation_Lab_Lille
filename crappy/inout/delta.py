@@ -122,7 +122,7 @@ class Delta(InOut,LoggerPerso):
             return self.mac_address
         else:
             res_l=[]
-            adapter=pygatt.GATTToolBackend()
+            adapter=pygatt.BGAPIBackend()
             adapter.reset()
             adapter.start()
             time.sleep(1)
