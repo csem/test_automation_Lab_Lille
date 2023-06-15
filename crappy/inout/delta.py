@@ -105,7 +105,7 @@ class Delta(InOut,LoggerPerso):
     def get_all_delta(self):
         device_prefix = "DELTA_00"
         address_l = []
-
+        self.adapter.reset()
         devices = self.adapter.scan()
         for device in devices:
             if device['name'].startswith(device_prefix) and device['address'] not in address_l:
@@ -114,6 +114,8 @@ class Delta(InOut,LoggerPerso):
         return address_l
 
     def get_add_mac(self,device_name):
+        self.adapter.reset()
+
         if self.mac_address is not None:
             return self.mac_address
 
