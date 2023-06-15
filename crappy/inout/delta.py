@@ -123,6 +123,7 @@ class Delta(InOut,LoggerPerso):
         else:
             res_l=[]
             adapter=pygatt.GATTToolBackend()
+            adapter.reset()
             adapter.start()
             time.sleep(1)
             devices = adapter.scan()
