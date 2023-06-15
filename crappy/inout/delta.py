@@ -156,7 +156,6 @@ class Delta(InOut,LoggerPerso):
             print(f"Exception: {str(ex)}")
         finally:
             adapter.stop()
-            adapter.reset()
 
             self.event.wait(self.scan_interval)
 
