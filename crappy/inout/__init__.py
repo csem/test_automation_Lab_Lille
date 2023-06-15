@@ -2,7 +2,7 @@
 
 from .inout import InOut, MetaIO
 
-from .ads1115 import Ads1115
+#from .ads1115 import Ads1115
 from .agilent34420A import Agilent34420a
 from .comedi import Comedi
 from .fake_inout import Fake_inout
