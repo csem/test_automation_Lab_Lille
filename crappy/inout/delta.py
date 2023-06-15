@@ -121,6 +121,7 @@ class Delta(InOut,LoggerPerso):
 
             return self.mac_address
         else:
+            res_l=[]
             adapter=pygatt.GATTToolBackend()
             adapter.start()
             time.sleep(1)
@@ -129,9 +130,12 @@ class Delta(InOut,LoggerPerso):
                 if device['name'] == device_name:
 
                     self.mac_address = device['address']
+                    res_l.append(self.mac_address)
                     adapter.stop()
-                    adapter.reset()
-                    return device['address']
+      
+                
+            adapter.reset()
+            return res_l[0]
 
 
 
