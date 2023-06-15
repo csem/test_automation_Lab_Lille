@@ -22,7 +22,7 @@ class Delta(InOut,LoggerPerso):
             self.api=None
             self.bool_res=False
             self.device_name=None
-
+            self.mac_address=None
             self.logger.info(" Initialization done !")
         except Exception as e:
             self.logger.info(" Error : initialization of the device is incorrect ")
@@ -76,18 +76,8 @@ class Delta(InOut,LoggerPerso):
             except Exception as e:
                 pass
         return bool_res
-
-
-
-
+            
     def flash_firmware_ota_dfu(self,id_device,version_firm,name_device):
-        async def is_device_available(device_address):
-            client = BleakClient(device_address)
-            try:
-                return await client.connect()
-            finally:
-                if client.is_connected:
-                    await client.disconnect()  
 
         command = f"nrfutil nrf5sdk-tools dfu ble -ic NRF52 -pkg sandbox/artifacts/app_{version_firm}.zip -p {id_device} -n {name_device}  -f" 
         process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -98,141 +88,73 @@ class Delta(InOut,LoggerPerso):
             return False
         else:
             print(f'Résultats de la commande : {stdout.decode()}')
-            process.wait()
-
-
-            loop = asyncio.get_event_loop()
-            device_is_available = loop.run_until_complete(is_device_available(id_device))
-            if not device_is_available:
-                print('L\'appareil n\'est pas disponible après le flashage.')
-                return False
             return True
-    def get_all_delta(self):
-        def handle_discovery(device, advertisement_data):
-            device_prefix = "DELTA_00"
-            if advertisement_data[0].startswith(device_prefix) and device.address not in address_l:
-                address_l.append(device.address)
-
-        async def run():
-            scanner = BleakScanner()
-            scanner.register_detection_callback(handle_discovery)
-      
-            await scanner.start()
-            await asyncio.sleep(15)
-            await scanner.stop()
-
-
+        
+      def get_all_delta(self):
+        device_prefix = "DELTA_00"
         address_l = []
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(run())
+
+        devices = self.adapter.scan()
+        for device in devices:
+            if device['name'].startswith(device_prefix) and device['address'] not in address_l:
+                address_l.append(device['address'])
+
         return address_l
 
+    def get_add_mac(self,device_name):
+        if self.mac_address is not None:
+            return self.mac_address
 
-    async def get_add_mac(self,device_name):
-        def handle_discovery(device, advertisement_data):
-            if advertisement_data[0].lower() == device_name.lower():
-                address_l.append(device.address)
+        devices = self.adapter.scan()
+        for device in devices:
+            if device['name'] == device_name:
+                self.mac_address = device['address']
+                return device['address']
 
-        async def run():
-            scanner = BleakScanner()
-            scanner.register_detection_callback(handle_discovery)
-            await scanner.start()
-            await asyncio.sleep(20)
-            await scanner.stop()
-
-        address_l = []
-
-        await run()
-
-        if len(address_l) > 0:
-            return address_l[0]
-        else:
-            return None
-
-
+        return None
 
     def get_value_from_device(self,uuid,address):
-        res_value=[]
-        async def run(address):
-            async with BleakClient(address) as client:
-                print(f"Connected: {client.is_connected}")
+        try:
+            device = self.adapter.connect(address)
+            self.event.wait(1)
 
-                value = await client.read_gatt_char(uuid)
-                res_value.append(value)
-                print(f"Value: {value}")
+            value = device.char_read(uuid)
+            return value
 
-
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(run(address))
-        return res_value[0]
-    
-    def get_multiple_value_from_device(self,uuid,address,time):
-        def callback(sender: int, data: bytearray):
-            res_l.append(data)
-        async def run(address,uuid,time):
-
-            async with BleakClient(address) as client:
-                print(f"Connected: {client.is_connected}")
-        
-                await client.start_notify(uuid, callback)
-                await asyncio.sleep(time)  
-                await client.stop_notify(uuid)
-
-        res_l = []
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(run(address,uuid,time))
-        return res_l
-    
-
-    def __sub_decode_bytearray_int(self,mapping):
-        return int(''.join(str(mapping[b]) for b in data3))
-
-    def decode_bytearray(self,bytearray,device_name,get_function_name):
-        firm=self.get_firm_version(device_name)
-        v_firm=firm.split("+")
-
-        if v_firm=="v1.1.114":
-            if get_function_name=="get_height":
-                mapping = {1: 2, 33: 10, 159: 2, 237: 10}
-                return self.__sub_decode_bytearray_int(mapping)
-            elif get_function_name=="get_weight":
-                mapping = {109: 2, 28: 10}
-                return self.__sub_decode_bytearray_int(mapping)
-
-
+        except (BLEError, NotConnectedError, NotificationTimeout) as ex:
+            print(f"Exception: {str(ex)}")
+        finally:
+            self.adapter.stop()
+            self.event.wait(self.scan_interval)
 
     ###################### GET GENERAL INFORMATIONS ###########################
-    def get_firm_version(self,device_name,uuid="00002a26-0000-1000-8000-00805f9b34fb"):
-        loop = asyncio.get_event_loop()
-        address=loop.run_until_complete(self.get_add_mac(device_name))
 
+    def get_firm_version(self,device_name,uuid="00002a26-0000-1000-8000-00805f9b34fb"):
+        address=self.get_add_mac(device_name)
         version_firm=self.get_value_from_device(uuid,address)
         return version_firm.decode()
-    
+
     def get_model_number(self,device_name,uuid="00002a24-0000-1000-8000-00805f9b34fb"):
         address=self.get_add_mac(device_name)
         model_number=self.get_value_from_device(uuid,address)
         return model_number.decode()
-    
+
     def get_serial_number(self,device_name,uuid="00002a25-0000-1000-8000-00805f9b34fb"):
         address=self.get_add_mac(device_name)
         serial_number=self.get_value_from_device(uuid,address)
         return serial_number.decode()
-    
+
     def get_manufact_name(self,device_name,uuid="00002a29-0000-1000-8000-00805f9b34fb"):
         address=self.get_add_mac(device_name)
-
         manufact_name=self.get_value_from_device(uuid,address)
         return manufact_name.decode()
-    
-
-    ###################### GET BATTERY INFORMATIONS ###########################
 
     def get_battery_level(self,device_name,uuid="00002a19-0000-1000-8000-00805f9b34fb"):
         address=self.get_add_mac(device_name)
         battery_level=self.get_value_from_device(uuid,address)
         return battery_level[0]
     
+    ################## NOT UPDATED ################################################
     def get_battery_level_multiple(self,device_name,uuid="00002a19-0000-1000-8000-00805f9b34fb",time=120):
         address=self.get_add_mac(device_name)
         battery_level=self.get_multiple_value_from_device(uuid,address,time)
