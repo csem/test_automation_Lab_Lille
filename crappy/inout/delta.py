@@ -90,7 +90,7 @@ class Delta(InOut,LoggerPerso):
             print(f'Résultats de la commande : {stdout.decode()}')
             return True
         
-      def get_all_delta(self):
+    def get_all_delta(self):
         device_prefix = "DELTA_00"
         address_l = []
 
