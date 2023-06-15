@@ -123,7 +123,7 @@ class Delta(InOut,LoggerPerso):
         else:
             res_l=[]
             adapter=pygatt.BGAPIBackend()
-            adapter.reset()
+
             adapter.start()
             time.sleep(1)
             devices = adapter.scan()
@@ -135,7 +135,7 @@ class Delta(InOut,LoggerPerso):
                     adapter.stop()
       
                 
-            adapter.reset()
+         
             return res_l[0]
 
 
