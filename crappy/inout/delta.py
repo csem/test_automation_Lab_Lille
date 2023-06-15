@@ -30,7 +30,7 @@ class Delta(InOut,LoggerPerso):
             self.bool_res=False
             self.device_name=None
             self.mac_address=None
-            self.adapter = GATTToolBackend()
+            self.adapter = pygatt.BGAPIBackend()
             self.adapter.start(reset_on_start=False)
             self.event = Event()
             self.scan_interval = 15  # or whatever you want your scan interval to be
@@ -114,11 +114,11 @@ class Delta(InOut,LoggerPerso):
         return address_l
 
     def get_add_mac(self,device_name):
-        self.adapter.reset()
+        
 
         if self.mac_address is not None:
             return self.mac_address
-
+self.adapter.reset()
         devices = self.adapter.scan()
         for device in devices:
             if device['name'] == device_name:
