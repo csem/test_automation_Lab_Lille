@@ -15,6 +15,7 @@ from pygatt.backends import GATTToolBackend
 from pygatt.exceptions import (
     BLEError, NotConnectedError, NotificationTimeout
 )
+import pygatt
 from threading import Event
 import time
 import struct
