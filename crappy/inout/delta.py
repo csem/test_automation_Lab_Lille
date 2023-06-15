@@ -31,7 +31,6 @@ class Delta(InOut,LoggerPerso):
             self.device_name=None
             self.mac_address=None
             self.adapter = pygatt.BGAPIBackend()
-            self.adapter.start(reset_on_start=False)
             self.event = Event()
             self.scan_interval = 15  # or whatever you want your scan interval to be
 
@@ -103,31 +102,39 @@ class Delta(InOut,LoggerPerso):
             return True
         
     def get_all_delta(self):
+        self.adapter.start()
         device_prefix = "DELTA_00"
         address_l = []
         devices = self.adapter.scan()
         for device in devices:
             if device['name'].startswith(device_prefix) and device['address'] not in address_l:
                 address_l.append(device['address'])
+        self.adapter.stop()
 
         return address_l
 
     def get_add_mac(self,device_name):
-        
 
         if self.mac_address is not None:
-            return self.mac_address
-        devices = self.adapter.scan()
-        for device in devices:
-            if device['name'] == device_name:
-                self.mac_address = device['address']
-                return device['address']
 
-        return None
+            return self.mac_address
+        else:
+            self.adapter.start()
+            devices = self.adapter.scan()
+            for device in devices:
+                if device['name'] == device_name:
+
+                    self.mac_address = device['address']
+                    self.adapter.stop()
+                    return device['address']
+
+
+
 
     def get_value_from_device(self,uuid,address):
+        self.adapter.start()
         try:
-            device = self.adapter.connect(address)
+            device = self.adapter.connect(address,address_type=pygatt.BLEAddressType.random)
             self.event.wait(1)
 
             value = device.char_read(uuid)
