@@ -130,15 +130,18 @@ class Delta(InOut,LoggerPerso):
 
                     self.mac_address = device['address']
                     adapter.stop()
+                    adapter.reset()
                     return device['address']
 
 
 
 
     def get_value_from_device(self,uuid,address):
-        self.adapter.start()
+        adapter=pygatt.GATTToolBackend()
+        adapter.start()
+        time.sleep(1)
         try:
-            device = self.adapter.connect(address,address_type=pygatt.BLEAddressType.random)
+            device = adapter.connect(address,address_type=pygatt.BLEAddressType.random)
             self.event.wait(1)
 
             value = device.char_read(uuid)
@@ -147,7 +150,9 @@ class Delta(InOut,LoggerPerso):
         except (BLEError, NotConnectedError, NotificationTimeout) as ex:
             print(f"Exception: {str(ex)}")
         finally:
-            self.adapter.stop()
+            adapter.stop()
+            adapter.reset()
+
             self.event.wait(self.scan_interval)
 
     ###################### GET GENERAL INFORMATIONS ###########################
