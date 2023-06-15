@@ -11,6 +11,13 @@ import asyncio
 from bleak import BleakClient, BleakScanner
 import subprocess
 import inspect
+from pygatt.backends import GATTToolBackend
+from pygatt.exceptions import (
+    BLEError, NotConnectedError, NotificationTimeout
+)
+from threading import Event
+import time
+import struct
 class Delta(InOut,LoggerPerso):
 
     def __init__(self):
@@ -23,6 +30,11 @@ class Delta(InOut,LoggerPerso):
             self.bool_res=False
             self.device_name=None
             self.mac_address=None
+            self.adapter = GATTToolBackend()
+            self.adapter.start(reset_on_start=False)
+            self.event = Event()
+            self.scan_interval = 15  # or whatever you want your scan interval to be
+
             self.logger.info(" Initialization done !")
         except Exception as e:
             self.logger.info(" Error : initialization of the device is incorrect ")
