@@ -150,14 +150,15 @@ class Delta(InOut,LoggerPerso):
             self.event.wait(1)
 
             value = device.char_read(uuid)
+            adapter.stop()
+
+            self.event.wait(self.scan_interval)
             return value
 
         except (BLEError, NotConnectedError, NotificationTimeout) as ex:
             print(f"Exception: {str(ex)}")
-        finally:
-            adapter.stop()
+    
 
-            self.event.wait(self.scan_interval)
 
     ###################### GET GENERAL INFORMATIONS ###########################
 
