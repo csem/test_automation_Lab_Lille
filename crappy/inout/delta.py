@@ -91,7 +91,7 @@ class Delta(InOut,LoggerPerso):
             
     def flash_firmware_ota_dfu(self,id_device,version_firm,name_device):
 
-        command = f"nrfutil nrf5sdk-tools dfu ble -ic NRF52 -pkg sandbox/artifacts/app_{version_firm}.zip -p {id_device} -n {name_device}  -f" 
+        command = f"nrfutil dfu ble -ic NRF52 -pkg sandbox/artifacts/app_{version_firm}.zip -p {id_device} -n {name_device}  -f" 
         process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = process.communicate()
 
