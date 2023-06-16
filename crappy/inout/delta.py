@@ -142,7 +142,7 @@ class Delta(InOut,LoggerPerso):
 
 
     def get_value_from_device(self,uuid,address):
-        adapter=pygatt.BGAPIBackend()
+        adapter=pygatt.GATTToolBackend() 
         adapter.start()
         time.sleep(1)
         try:
