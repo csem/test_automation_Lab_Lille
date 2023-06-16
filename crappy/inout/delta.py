@@ -20,23 +20,29 @@ from threading import Event
 import time
 import struct
 class Delta(InOut,LoggerPerso):
+
     def __init__(self):
         try:
+            class_name=__name__
+            LoggerPerso.__init__(self,class_name)
+            self.logger.info(" Initialization of the device ...")
             super().__init__()
-            self.logger = self.initialize_logger(__name__)
-            self.api = None
-            self.device_name = None
-            self.mac_address = None
+            self.api=None
+            self.bool_res=False
+            self.device_name=None
+            self.mac_address=None
+            
             self.event = Event()
-            self.scan_interval = 15
-        except Exception as e:
-            self.logger.error("Error during initialization: %s", e)
+            self.scan_interval = 15  # or whatever you want your scan interval to be
 
-    @staticmethod
-    def initialize_logger(class_name):
-        logger = LoggerPerso(class_name)
-        logger.info("Initialization of the device ...")
-        return logger
+            self.logger.info(" Initialization done !")
+        except Exception as e:
+            self.logger.info(" Error : initialization of the device is incorrect ")
+
+
+    def open(self):
+        pass
+     
 
     def connect_to_api(self, api, target, msg):
         try:
@@ -131,8 +137,6 @@ class Delta(InOut,LoggerPerso):
         except (BLEError, NotConnectedError, NotificationTimeout) as ex:
             self.logger.error("Exception: %s", ex)
 
-
-    # NEED TO REFACTORE THIS NEXT WEEK
     def get_firm_version(self, device_name, uuid="00002a26-0000-1000-8000-00805f9b34fb"):
         return self.get_device_info(device_name, uuid, "firm_version")
 
