@@ -164,6 +164,7 @@ class Delta(InOut,LoggerPerso):
 
     def get_firm_version(self,device_name,uuid="00002a26-0000-1000-8000-00805f9b34fb"):
         address=self.get_add_mac(device_name)
+        print(address)
         version_firm=self.get_value_from_device(uuid,address)
         return version_firm.decode()
 
