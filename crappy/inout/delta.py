@@ -133,6 +133,7 @@ class Delta(InOut,LoggerPerso):
                     self.mac_address = device['address']
                     res_l.append(self.mac_address)
                     adapter.stop()
+                    
       
                 
          
@@ -144,10 +145,10 @@ class Delta(InOut,LoggerPerso):
     def get_value_from_device(self,uuid,address):
         adapter=pygatt.BGAPIBackend()
         adapter.start()
-        time.sleep(1)
+        time.sleep(5)
         try:
             device = adapter.connect(address,address_type=pygatt.BLEAddressType.random)
-            self.event.wait(1)
+            self.event.wait(5)
 
             value = device.char_read(uuid)
             adapter.stop()
