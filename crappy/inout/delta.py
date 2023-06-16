@@ -146,7 +146,7 @@ class Delta(InOut,LoggerPerso):
         adapter.start()
         time.sleep(1)
         try:
-            device = adapter.connect(address,address_type=pygatt.BLEAddressType.random)
+            device = adapter.connect(address,address_type=pygatt.BLEAddressType.public)
             self.event.wait(1)
 
             value = device.char_read(uuid)
