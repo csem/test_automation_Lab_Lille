@@ -165,6 +165,7 @@ class Delta(InOut,LoggerPerso):
     def get_firm_version(self,device_name,uuid="00002a26-0000-1000-8000-00805f9b34fb"):
         address=self.get_add_mac(device_name)
         version_firm=self.get_value_from_device(uuid,address)
+        self.logger.info(f"Versio nfirm read : {version_firm}")
         return version_firm.decode()
 
     def get_model_number(self,device_name,uuid="00002a24-0000-1000-8000-00805f9b34fb"):
@@ -175,6 +176,7 @@ class Delta(InOut,LoggerPerso):
     def get_serial_number(self,device_name,uuid="00002a25-0000-1000-8000-00805f9b34fb"):
         address=self.get_add_mac(device_name)
         serial_number=self.get_value_from_device(uuid,address)
+        self.logger.info(f"Serial read : {version_firm}")
         return serial_number.decode()
 
     def get_manufact_name(self,device_name,uuid="00002a29-0000-1000-8000-00805f9b34fb"):
