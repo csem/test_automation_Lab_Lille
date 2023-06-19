@@ -120,8 +120,10 @@ class Delta(InOut,LoggerPerso):
                     result_addresses.append(self.mac_address)
                     adapter.stop()
             print(f" res adress : {result_addresses}")
-            return result_addresses[0]
-
+            if result_addresses:  # Check if the list is not empty
+                return result_addresses[0]
+            else:
+                return None 
 
     def get_value_from_device(self, uuid, address):
         adapter = self.initialize_adapter()
