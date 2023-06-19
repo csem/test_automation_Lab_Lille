@@ -111,15 +111,16 @@ class Delta(InOut,LoggerPerso):
         if self.mac_address is not None:
             return self.mac_address
         else:
-            res_l = []
+            result_addresses = []
             adapter = self.initialize_adapter()
             devices = adapter.scan()
             for device in devices:
                 if device['name'] == device_name:
                     self.mac_address = device['address']
-                    res_l.append(self.mac_address)
+                    result_addresses.append(self.mac_address)
                     adapter.stop()
-            return res_l[0]
+            return result_addresses[0]
+
 
     def get_value_from_device(self, uuid, address):
         adapter = self.initialize_adapter()
@@ -137,28 +138,52 @@ class Delta(InOut,LoggerPerso):
         except (BLEError, NotConnectedError, NotificationTimeout) as ex:
             self.logger.error("Exception: %s", ex)
 
-    def get_firm_version(self, device_name, uuid="00002a26-0000-1000-8000-00805f9b34fb"):
-        return self.get_device_info(device_name, uuid, "firm_version")
+    def get_values_from_device(self, uuid, address):
+        adapter = self.initialize_adapter()
+        time.sleep(10)
+        try:
+            device = adapter.connect(address, address_type=pygatt.BLEAddressType.random)
+            self.scan_event.wait(10)
+            values = []
+            for id in uuid:
+                values.append([id[0], device.char_read(id[1])])
+            adapter.stop()
 
-    def get_model_number(self, device_name, uuid="00002a24-0000-1000-8000-00805f9b34fb"):
-        return self.get_device_info(device_name, uuid, "model_number")
+            self.scan_event.wait(self.scan_interval)
+            return values
 
-    def get_serial_number(self, device_name, uuid="00002a25-0000-1000-8000-00805f9b34fb"):
-        return self.get_device_info(device_name, uuid, "serial_number")
+        except (BLEError, NotConnectedError, NotificationTimeout) as ex:
+            self.logger.error("Exception: %s", ex)
 
-    def get_manufact_name(self, device_name, uuid="00002a29-0000-1000-8000-00805f9b34fb"):
-        return self.get_device_info(device_name, uuid, "manufact_name")
+    def get_uuid(self, uuid_type):
+        uuid_dict = {
+            "firm_version": "00002a26-0000-1000-8000-00805f9b34fb",
+            "model_number": "00002a24-0000-1000-8000-00805f9b34fb",
+            "serial_number": "00002a25-0000-1000-8000-00805f9b34fb",
+            "manufact_name": "00002a29-0000-1000-8000-00805f9b34fb",
+            "battery_level": "00002a19-0000-1000-8000-00805f9b34fb"
+        }
+        return uuid_dict.get(uuid_type, None)
 
-    def get_battery_level(self, device_name, uuid="00002a19-0000-1000-8000-00805f9b34fb"):
-        address = self.get_add_mac(device_name)
-        battery_level = self.get_value_from_device(uuid, address)
-        return battery_level[0]
 
-    def get_device_info(self, device_name, uuid, info_type):
+    def get_device_info(self, device_name,info_type,uuid=None):
+        if uuid==None:
+            uuid=self.get_uuid(info_type)
         address = self.get_add_mac(device_name)
         info_value = self.get_value_from_device(uuid, address)
         self.logger.info(f"{info_type}: {info_value.decode()}")
-        return info_value.decode()
+        return info_value
+    
+    def get_device_infos(self, device_name,info_type,uuid=None):
+        if uuid==None or len(info_type)!=len(uuid):
+            uuid=[]
+            for x in info_type:
+                uuid.append([x,self.get_uuid(info_type)])
+        address = self.get_add_mac(device_name)
+        info_value = self.get_values_from_device(uuid, address)
+        self.logger.info(f"{info_type}: {info_value}")
+        return info_value
+    
 
 
 
