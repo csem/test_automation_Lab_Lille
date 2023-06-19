@@ -119,6 +119,7 @@ class Delta(InOut,LoggerPerso):
                     self.mac_address = device['address']
                     result_addresses.append(self.mac_address)
                     adapter.stop()
+            print(f" res adress : {result_addresses}")
             return result_addresses[0]
 
 
