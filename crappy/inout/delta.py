@@ -166,13 +166,15 @@ class Delta(InOut,LoggerPerso):
             "manufact_name": "00002a29-0000-1000-8000-00805f9b34fb",
             "battery_level": "00002a19-0000-1000-8000-00805f9b34fb"
         }
-        return uuid_dict.get(uuid_type, None)
+        return uuid_dict.get(uuid_type)
 
 
     def get_device_info(self, device_name,info_type,uuid=None):
         if uuid==None:
             uuid=self.get_uuid(info_type)
         address = self.get_add_mac(device_name)
+        print(f"uuid : {uuid}")
+        print(f"adress : {address}")
         info_value = self.get_value_from_device(uuid, address)
         self.logger.info(f"{info_type}: {info_value.decode()}")
         return info_value
