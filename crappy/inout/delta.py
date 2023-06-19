@@ -1,3 +1,4 @@
+
 import crappy
 import time
 import pyvisa
@@ -111,19 +112,15 @@ class Delta(InOut,LoggerPerso):
         if self.mac_address is not None:
             return self.mac_address
         else:
-            result_addresses = []
+            res_l = []
             adapter = self.initialize_adapter()
             devices = adapter.scan()
             for device in devices:
                 if device['name'] == device_name:
                     self.mac_address = device['address']
-                    result_addresses.append(self.mac_address)
+                    res_l.append(self.mac_address)
                     adapter.stop()
-            print(f" res adress : {result_addresses}")
-            if result_addresses:  # Check if the list is not empty
-                return result_addresses[0]
-            else:
-                return None 
+            return res_l[0]
 
     def get_value_from_device(self, uuid, address):
         adapter = self.initialize_adapter()
