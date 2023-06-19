@@ -110,17 +110,13 @@ class Delta(InOut,LoggerPerso):
 
     def get_add_mac(self, device_name):
         if self.mac_address is not None:
-            print(f"Mac already {self.mac_address}")
             return self.mac_address
         else:
             res_l = []
             adapter = self.initialize_adapter()
             devices = adapter.scan()
-            print(devices)
             for device in devices:
-                print(device)
                 if device['name'] == device_name:
-                    print("FOUND")
                     self.mac_address = device['address']
                     res_l.append(self.mac_address)
                     adapter.stop()
@@ -174,8 +170,6 @@ class Delta(InOut,LoggerPerso):
         if uuid==None:
             uuid=self.get_uuid(info_type)
         address = self.get_add_mac(device_name)
-        print(f"uuid : {uuid}")
-        print(f"adress : {address}")
         info_value = self.get_value_from_device(uuid, address)
         self.logger.info(f"{info_type}: {info_value.decode()}")
         return info_value
