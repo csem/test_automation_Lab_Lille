@@ -1,12 +1,11 @@
 
 
 from .jlink import JLINK
-
+from pynrfjprog import API, HighLevel,LowLevel
 import pylink
 
 
 class Global_JLINK(JLINK):
-
     def start_rtt(self):
         if self.connected:
             self.api.rtt_start()
@@ -67,18 +66,13 @@ class Global_JLINK(JLINK):
     def flash_firmware(self, firmware_path):
         if self.connected:
             try:
-                self.logger.info("Beginning reset and flashing...")
                 self.api.sys_reset()
                 self.api.erase_all()
-                self.logger.info("Reset done !")
                 self.api.program_file(firmware_path)
-                self.logger.info("Flashing done!")
                 self.api.sys_reset()
                 self.api.go()
-                self.logger.info("Reset after flash done!")
                 return True
             except Exception as e:
-                self.logger.error("Error during flashing: %s", e)
                 return False
         else:
             raise RuntimeError("NRF device is not connected.")
