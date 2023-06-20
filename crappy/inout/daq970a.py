@@ -3,8 +3,8 @@ import time
 import pyvisa
 from .inout import InOut
 from datetime import datetime
-from .general_class import General
-from .general_class import LoggerPerso
+from .general_inout import General
+from .general_inout import LoggerPerso
 import logging
 class Daq970a(InOut,General,LoggerPerso):
 
