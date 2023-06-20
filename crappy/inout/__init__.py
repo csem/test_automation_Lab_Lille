@@ -25,6 +25,7 @@ from .waveshare_ad_da_ft232h import Waveshare_ad_da_ft232h
 from .waveshare_high_precision import Waveshare_high_precision
 from .daq970a import Daq970a
 from .delta import Delta
+from ..general_class.logger_perso import LoggerPerso
 # Win specific
 #from .daqmx import Daqmx
 
