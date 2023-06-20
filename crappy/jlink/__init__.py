@@ -1,10 +1,11 @@
 # coding: utf-8
 
 
-
+from .jlink import JLINK, MetaJLINK
 from .global_jlink import Global_JLINK
-# Win specific
-#from .daqmx import Daqmx
 
+
+
+inout_dict = MetaJLINK.classes
 # All the inout objects
 
