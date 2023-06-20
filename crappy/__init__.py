@@ -12,6 +12,7 @@ from . import tool
 from . import blocks
 from . import links
 from . import modifier
+from .jlink import jlink
 from .__version__ import __version__
 
 # For compatibility (deprecated!)
