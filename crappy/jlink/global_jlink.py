@@ -7,8 +7,6 @@ import time
 import numpy as np
 
 class Global_JLINK(JLINK):
-
-
     def ascii_to_int(self,array):
         string = ''.join(chr(digit) for digit in array)
         numbers_str = string.split("\n")
@@ -29,6 +27,7 @@ class Global_JLINK(JLINK):
     def stop_rtt(self):
         if self.connected and self.rtt:
             self.api.rtt_stop()
+      
             self.rtt = False
         else:
             raise RuntimeError("NRF device is not connected.")
@@ -54,6 +53,8 @@ class Global_JLINK(JLINK):
             return results
         else:
             raise RuntimeError("NRF device is not connected.")
+        
+    
         
 
 
