@@ -3,19 +3,26 @@
 from .jlink import JLINK
 from pynrfjprog import API, HighLevel,LowLevel
 import pylink
-
+import time
+import numpy as np
 
 class Global_JLINK(JLINK):
+
+
+    def ascii_to_int(self,array):
+        string = ''.join(chr(digit) for digit in array)
+        numbers_str = string.split("\n")
+
+        numbers_str.pop(0)
+        numbers_str = numbers_str[:-1]
+        numbers = [int(num_str) for num_str in numbers_str if num_str.isdigit()]
+
+        return numbers
     def start_rtt(self):
         if self.connected:
             self.api.rtt_start()
+            time.sleep(1)
             self.rtt = True
-        else:
-            raise RuntimeError("NRF device is not connected.")
-    def get_data(self):
-        if self.connected:
-            data = None
-            return data
         else:
             raise RuntimeError("NRF device is not connected.")
 
@@ -28,51 +35,26 @@ class Global_JLINK(JLINK):
 
     def read_rtt(self, up_channel_index=0, length=1024):
         if self.connected and self.rtt:
-            return self.api.rtt_read(up_channel_index, length)
-        else:
-            raise RuntimeError("NRF device is not connected.")
 
-    def write_rtt(self, down_channel_index=0, data=None):
-        if self.connected and self.rtt and data is not None:
-            return self.api.rtt_write(down_channel_index, data)
-        else:
-            raise RuntimeError("NRF device is not connected.")
+            results = []
 
-    def start_stream(self):
-        if self.connected:
-            pass
-        else:
-            raise RuntimeError("NRF device is not connected.")
-
-    def get_stream(self):
-        if self.connected:
-            stream_data = None
-            return stream_data
-        else:
-            raise RuntimeError("NRF device is not connected.")
-
-    def stop_stream(self):
-        if self.connected:
-            pass
+            count = 0
+            while count < 3:
+                num_up = self.api.rtt_get_num_up_buffers()
+                for i in range(num_up):
+                    time.sleep(1)
+                    data = self.api.rtt_read(i, 1024)
+                    if data != []:
+                        print(f"Len data : {len(data)}")
+                        converted_data = self.ascii_to_int(data)
+                        print(f"Len conv data : {len(converted_data)}")
+                        results.append(converted_data)
+                        count += 1
+                        break
+            return results
         else:
             raise RuntimeError("NRF device is not connected.")
         
-    def read_data(self, addr, data_len):
-        if self.connected:
-            return self.api.read(addr, data_len)
-        else:
-            raise RuntimeError("NRF device is not connected.")
-    
-    def flash_firmware(self, firmware_path):
-        if self.connected:
-            try:
-                self.api.sys_reset()
-                self.api.erase_all()
-                self.api.program_file(firmware_path)
-                self.api.sys_reset()
-                self.api.go()
-                return True
-            except Exception as e:
-                return False
-        else:
-            raise RuntimeError("NRF device is not connected.")
+
+
+  

@@ -6,6 +6,7 @@ import numpy as np
 from .._global import DefinitionError
 from pynrfjprog import API, HighLevel,LowLevel
 
+import pylink
 class MetaJLINK(type):
   """Metaclass ensuring that two JLINK don't have the same name, and that all
   JLINK define the required methods. Also keeps track of all the JLINK
@@ -32,14 +33,14 @@ class MetaJLINK(type):
 
 class JLINK(metaclass=MetaJLINK):   
     def __init__(self):
-        self.api = LowLevel.API()
+        self.api = pylink.JLink()
         self.connected = False
         self.rtt = None
 
-    def open(self, device_family):
+    def open(self, id):
         try:
             self.api.open()
-            self.api.connect_to_emu_with_snr(device_family)
+            self.api.connect(id)
             self.connected = True
         except LowLevel.APIError as e:
             self.connected = False
@@ -48,7 +49,6 @@ class JLINK(metaclass=MetaJLINK):
     def close(self):
         if self.rtt is not None:
             self.api.rtt_stop()
-        self.api.disconnect_from_emu()
         self.api.close()
         self.connected = False
 
