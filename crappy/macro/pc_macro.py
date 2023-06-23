@@ -24,35 +24,35 @@ class PC_MACRO(MACRO):
 
     def word_open(self):
         self.gui.press('win')
-        time.sleep(0.5)
+        sleep(0.5)
         self.gui.write('Word')
         self.gui.press('enter')
-        time.sleep(5)
+        sleep(5)
 
     def word_new_page(self):
         self.gui.press('enter')
-        time.sleep(0.5)
+        sleep(0.5)
     
     def word_write_text(self,content):
         self.gui.write(content)
-        time.sleep(0.5)
+        sleep(0.5)
 
     def word_save_file(self,filename):
-        time.sleep(0.5)
+        sleep(0.5)
         self.gui.hotkey("alt","f")
-        time.sleep(0.5)
+        sleep(0.5)
         self.gui.press("U")
-        time.sleep(1)
+        sleep(1)
         self.gui.press("O")
-        time.sleep(1)
+        sleep(1)
         path = os.getcwd() + "\\" + filename+".docx"
         self.gui.write(path)
-        time.sleep(1)
+        sleep(1)
         self.gui.press('enter')
     
-        time.sleep(1)
+        sleep(1)
         self.gui.press('enter')
-        time.sleep(0.5)
+        sleep(0.5)
 
 
 
@@ -64,11 +64,11 @@ class PC_MACRO(MACRO):
             return text
         
     def word_close(self):
-        time.sleep(1)
+        sleep(1)
         self.gui.hotkey('alt', 'f4')
-        time.sleep(1)
+        sleep(1)
         self.gui.press('enter')
-        time.sleep(0.5)
+        sleep(0.5)
     
     def start_playwright(self):
         self.playwright = sync_playwright().start()
@@ -90,37 +90,37 @@ class PC_MACRO(MACRO):
 
         frame.fill('input[name="UserID"]', user_id)
         frame.fill('input[name="Password"]', password)
-        sleep(5)
+        sleep(2)
 
         with self.page.expect_navigation():
             frame.click('input[name="edit"]')
 
-        sleep(5)
+        sleep(6)
 
         frame_element = self.page.query_selector('frame')
         frame = frame_element.content_frame()
 
         return frame
 
-    def interact_with_frames(self, frame_name):
+    def interact_with_frames(self, frame_name,hours,minutes,description):
         frames = self.page.frames
         for frame in frames:
             print(frame.name)
             if frame.name == frame_name:
                 frame.wait_for_selector('#hours')
-                frame.select_option('#hours', '8')
-                sleep(5)
+                frame.select_option('#hours', hours)
+                sleep(3)
 
                 frame.wait_for_selector('#minutesList')
-                frame.select_option('#minutesList', '15')
-                sleep(5)
+                frame.select_option('#minutesList', minutes)
+                sleep(2)
 
                 frame.wait_for_selector('#projList')
                 frame.select_option('#projList', '6251798')
-                sleep(5)
+                sleep(2)
 
                 frame.wait_for_selector('#description')
-                frame.fill('#description', 'Work on macro test')
+                frame.fill('#description', description)
 
                 sleep(10)
 
