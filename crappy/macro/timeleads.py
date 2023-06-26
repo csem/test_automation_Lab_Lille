@@ -14,62 +14,8 @@ from playwright.sync_api import sync_playwright
 
 
 
-class PC_MACRO(MACRO):
+class Timeleads(MACRO):
 
-    def __init__(self):
-        self.gui=pyautogui
-        self.browser=None
-        self.page=None
-        self.playwright=None
-
-    def word_open(self):
-        self.gui.press('win')
-        sleep(0.5)
-        self.gui.write('Word')
-        self.gui.press('enter')
-        sleep(5)
-
-    def word_new_page(self):
-        self.gui.press('enter')
-        sleep(0.5)
-    
-    def word_write_text(self,content):
-        self.gui.write(content)
-        sleep(0.5)
-
-    def word_save_file(self,filename):
-        sleep(0.5)
-        self.gui.hotkey("alt","f")
-        sleep(0.5)
-        self.gui.press("U")
-        sleep(1)
-        self.gui.press("O")
-        sleep(1)
-        path = os.getcwd() + "\\" + filename+".docx"
-        self.gui.write(path)
-        sleep(1)
-        self.gui.press('enter')
-    
-        sleep(1)
-        self.gui.press('enter')
-        sleep(0.5)
-
-
-
-
-    def word_get_content(self,filename):
-        doc = Document(filename)
-        for para in doc.paragraphs:
-            text = para.text.replace('\xa0', ' ')
-            return text
-        
-    def word_close(self):
-        sleep(1)
-        self.gui.hotkey('alt', 'f4')
-        sleep(1)
-        self.gui.press('enter')
-        sleep(0.5)
-    
     def start_playwright(self):
         self.playwright = sync_playwright().start()
         

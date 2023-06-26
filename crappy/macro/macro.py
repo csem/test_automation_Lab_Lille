@@ -2,7 +2,10 @@
 from time import time, sleep
 from typing import Optional, Dict, Any, Union, List
 import numpy as np
-
+from docx import Document
+from pyppeteer import launch
+import pyautogui
+from pywinauto.application import Application
 from .._global import DefinitionError
 
 class MetaMACRO(type):
@@ -29,9 +32,12 @@ class MetaMACRO(type):
 
 
 
-class MACRO(metaclass=MetaMACRO):   
+class MACRO(metaclass=MetaMACRO):
     def __init__(self):
-        pass
+        self.gui=pyautogui
+        self.browser=None
+        self.page=None
+        self.playwright=None
 
     def open(self, id):
         pass
@@ -42,5 +48,15 @@ class MACRO(metaclass=MetaMACRO):
 
     def set_cmd(self, *cmd):
         pass
+    
+    def press_keys(self,keys):
+      self.gui.press(keys)
+
+    def write_keys(self,keys):
+      self.gui.write(keys)
+
+    def press_hotkeys(self,hotkeys):
+      self.gui.hotkey(hotkeys)
+          
 
    
