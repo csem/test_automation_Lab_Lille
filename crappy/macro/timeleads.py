@@ -15,7 +15,6 @@ from playwright.sync_api import sync_playwright
 
 
 class Timeleads(MACRO):
-
     def start_playwright(self):
         self.playwright = sync_playwright().start()
         
