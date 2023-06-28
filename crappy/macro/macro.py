@@ -5,7 +5,6 @@ import numpy as np
 from docx import Document
 from pyppeteer import launch
 import pyautogui
-from pywinauto.application import Application
 from .._global import DefinitionError
 
 class MetaMACRO(type):

@@ -8,7 +8,6 @@ import os
 from docx import Document
 from pyppeteer import launch
 import pyautogui
-from pywinauto.application import Application
 from time import sleep
 from playwright.sync_api import sync_playwright
 
