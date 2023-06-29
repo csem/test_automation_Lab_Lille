@@ -33,22 +33,30 @@ class Global_JLINK(JLINK):
             raise RuntimeError("NRF device is not connected.")
     def write_rtt(self, letter, down_channel_index=0):
         if self.connected and self.rtt:
-            ascii_letter = ord(letter)
-       
+            try:
+                ascii_letter = ord(letter)
+        
 
-            ascii_bytes = [ascii_letter]
+                ascii_bytes = [ascii_letter]
 
-            self.api.rtt_write(down_channel_index, ascii_bytes)
+                self.api.rtt_write(down_channel_index, ascii_bytes)
             
+                return True
+            except Exception as e:
+                return False
 
         else:
             raise RuntimeError("NRF device is not connected.")
         
     def read_rtt_second_test(self, buffer_index=0, num_bytes=1024):
         if self.connected and self.rtt:
-            time.sleep(1)
-            response = self.api.rtt_read(buffer_index, num_bytes)
-            return chr(response[0])
+            try:
+                time.sleep(1)
+                response = self.api.rtt_read(buffer_index, num_bytes)
+            
+                return True,chr(response[0])
+            except Exception as e:
+                return False,"no response"
         else:
             raise RuntimeError("NRF device is not connected.")
     def read_rtt_first_test(self, up_channel_index=0, length=1024):
