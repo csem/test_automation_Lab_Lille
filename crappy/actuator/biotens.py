@@ -1,4 +1,4 @@
-﻿# coding: utf-8
+# coding: utf-8
 
 from struct import pack, unpack
 from typing import Union, Optional
