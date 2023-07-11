@@ -6,7 +6,6 @@ import numpy as np
 import pyautogui
 import os
 from docx import Document
-from pyppeteer import launch
 import pyautogui
 from pywinauto.application import Application
 from time import sleep
