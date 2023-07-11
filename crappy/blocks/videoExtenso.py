@@ -1,4 +1,4 @@
-﻿# coding: utf-8
+# coding: utf-8
 
 from typing import Callable, Union, Optional, List, Dict, Any
 import numpy as np
