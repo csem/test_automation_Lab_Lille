@@ -1,9 +1,7 @@
 name: Build, Release and Upload Python Package
 
 on: 
-  push:
-    tags:
-      - 'v*'
+  workflow_dispatch: {}
 
 jobs:
   build:
@@ -12,41 +10,34 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Set up Python 3.10.11
+    - name: Set up Python 3.8
       uses: actions/setup-python@v2
       with:
-        python-version: 3.10.11
+        python-version: 3.8
 
-    - name: Install dependencies
+    - name: Install pipreqs and other dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install setuptools wheel
+        pip install setuptools wheel pipreqs
 
-    - name: Build wheel package
-      run: python setup.py sdist bdist_wheel
+    - name: Modify specific files
+      run: |
+        sed -i '1s/^\xEF\xBB\xBF//' temp_folder_crappy/crappy/blocks/videoExtenso.py || true
+        sed -i '1s/^\xEF\xBB\xBF//' temp_folder_crappy/crappy/actuator/biotens.py || true
+        sed -i '1s/^\xEF\xBB\xBF//' temp_folder_crappy/crappy/actuator/biaxe.py || true
 
-    - name: Identify Wheel File
-      id: wheel_file
-      run: echo "::set-output name=path::$(ls dist/*.whl)"
+    - name: Generate requirements.txt
+      run: |
+        /app/venv_claiton/bin/pipreqs temp_folder_crappy --force
 
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-        draft: false
-        prerelease: false
+    - name: Modify requirements.txt
+      run: |
+        sed -i '/^Pillow==10.0.0/d' temp_folder_crappy/requirements.txt
+        sed -i '/^pywinauto==/d' temp_folder_crappy/requirements.txt
+        sed -i '/^picamera==/d' temp_folder_crappy/requirements.txt
+        sed -i '/^pycuda==/d' temp_folder_crappy/requirements.txt
+        sed -i 's/^docx==.*/python-docx/' temp_folder_crappy/requirements.txt
+        sed -i '/^pyppeteer==/d' temp_folder_crappy/requirements.txt
+        sed -i 's/^scikit-image0.0/scikit-image/' temp_folder_crappy/requirements.txt
+        sed -i 's/^skimage==0.0/scikit-image/' temp_folder_crappy/requirements.txt
 
-    - name: Upload Release Asset
-      id: upload-release-asset 
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ${{ steps.wheel_file.outputs.path }}
-        asset_name: ${{ steps.wheel_file.outputs.path }}
-        asset_content_type: application/zip
