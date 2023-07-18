@@ -72,7 +72,11 @@ Documentation
 The latest versions of the documentation can be accessed on our
 [ReadTheDocs](https://crappy.readthedocs.io/) page. It contains descriptions of
 Crappy's features, tutorials, and other useful information.
-
+Also, here are a few things that are not in the readthedoc :
+- If you want to add a class in a folder, dont forget to add it in the __init__.py
+- Same thing if you add a new folder.
+- Look at jlink class if you want simple exemple to add a class
+- Loot at delta class if you want more complex exemple
 Bug reports
 -----------
 
