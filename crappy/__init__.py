@@ -13,6 +13,8 @@ from . import blocks
 from . import links
 from . import modifier
 from . import general_class
+from . import jlink
+from . import macro
 from .__version__ import __version__
 
 # For compatibility (deprecated!)
