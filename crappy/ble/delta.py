@@ -21,10 +21,29 @@ import pygatt
 from threading import Event
 import time
 import struct
+
+
+
 class Delta(BLE,LoggerPerso):
 
+    def __init__(self):
+        try:
+            class_name=__name__
+            LoggerPerso.__init__(self,class_name)
+            self.logger.info(" Initialization of the device ...")
+ 
+            self.api=None
+            self.bool_res=False
+            self.device_name=None
+            self.mac_address=None
+            self.event = Event()
+            self.scan_interval = 15  # or whatever you want your scan interval to be
+            self.logger.info(" Initialization done !")
+        except Exception as e:
+            self.logger.info(" Error : initialization of the device is incorrect ")
 
 
+       
     def flash_firmware_ota_dfu(self, version_firm, name_device):
         command = f"nrfutil dfu ble -ic NRF52 -pkg sandbox/artifacts/app_{version_firm}.zip -p {self.mac_address} -n {name_device}  -f"
         process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)

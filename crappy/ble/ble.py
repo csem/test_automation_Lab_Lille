@@ -50,25 +50,7 @@ class MetaBLE(type):
 
 
 
-class BLE(LoggerPerso,metaclass=MetaJBLE):   
-    def __init__(self):
-        try:
-            class_name=__name__
-            LoggerPerso.__init__(self,class_name)
-            self.logger.info(" Initialization of the device ...")
-            super().__init__()
-            self.api=None
-            self.bool_res=False
-            self.device_name=None
-            self.mac_address=None
-            
-            self.event = Event()
-            self.scan_interval = 15  # or whatever you want your scan interval to be
-
-            self.logger.info(" Initialization done !")
-        except Exception as e:
-            self.logger.info(" Error : initialization of the device is incorrect ")
-
+class BLE(LoggerPerso,metaclass=MetaBLE):   
 
     def open(self):
         pass

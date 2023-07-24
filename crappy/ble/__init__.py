@@ -1,4 +1,4 @@
 
 
 from .ble import BLE
-from .ble import Delta
+from .delta import Delta
