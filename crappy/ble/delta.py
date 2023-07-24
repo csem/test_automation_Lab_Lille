@@ -37,7 +37,7 @@ class Delta(BLE,LoggerPerso):
             self.device_name=None
             self.mac_address=None
             self.event = Event()
-            self.scan_interval = 15  # or whatever you want your scan interval to be
+            self.scan_interval = 15 
             self.logger.info(" Initialization done !")
         except Exception as e:
             self.logger.info(" Error : initialization of the device is incorrect ")
