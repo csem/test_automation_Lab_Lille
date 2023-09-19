@@ -10,7 +10,7 @@ Pillow==10.0.0
 psutil==5.9.5
 
 PyDAQmx==1.4.6
-pygatt==4.0.5
+pygatt
 pymodbus==3.3.2
 pynrfjprog==10.22.0
 pyserial==3.5
